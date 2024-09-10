@@ -1,19 +1,34 @@
 <script setup>
-import { ref, defineEmits } from 'vue'
+import { ref } from 'vue'
+
+const props = defineProps({
+  toggleType: {
+    type: String,
+    required: true
+  }
+})
 
 const emit = defineEmits(['update:addText'])
 
 const addText = ref(false)
+const setColor = ref(false)
+const type = ref(props.toggleType)
 
-const toggleAddText = () => {
-  addText.value = !addText.value
-  emit('update:addText', addText.value)
+const handleToggle = () => {
+  if (type.value === 'text') {
+    addText.value = !addText.value
+    emit('update:addText', addText.value)
+  }
+  if (type.value === 'textColor') {
+    setColor.value = !setColor.value
+    emit('update:setFontColor', setColor.value)
+  }
 }
 </script>
 
 <template>
   <label class="switch">
-    <input type="checkbox" class="checkbox" @click="toggleAddText" />
+    <input type="checkbox" class="checkbox" @click="handleToggle()" />
     <div class="slider"></div>
   </label>
 </template>

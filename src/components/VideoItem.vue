@@ -7,8 +7,6 @@ defineProps({
     required: true
   }
 })
-mounted: {
-}
 </script>
 
 <template>

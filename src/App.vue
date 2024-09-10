@@ -3,6 +3,7 @@ import TheHeader from './components/TheHeader.vue'
 import VideoItem from './components/VideoItem.vue'
 import TheButton from './components/TheButton.vue'
 import ToggleSwitch from './components/ToggleSwitch.vue'
+import { Vue3ColorPicker } from '@cyhnkckali/vue3-color-picker'
 import { ref, inject, computed } from 'vue'
 
 //state
@@ -31,6 +32,7 @@ const addText = ref(false)
 const topText = ref('')
 const midText = ref('')
 const bottomText = ref('')
+const setFontColor = ref(false)
 
 const title = computed(() => {
   return steps[currentStep.value].title
@@ -61,6 +63,10 @@ const generateGIF = (obj) => {
 
 const updateAddText = (data) => {
   addText.value = data
+}
+
+const updateSetFontColor = (data) => {
+  setFontColor.value = data
 }
 
 const startRecording = async () => {
@@ -121,30 +127,50 @@ const startRecording = async () => {
       <div id="gifElement" class="mx-auto relative">
         <img :src="currentGifSrc" alt="" />
         <div v-if="addText" class="absolute top-0 flex flex-col h-full w-full justify-between p-2">
-          <input type="text" name="" id="" />
-          <input type="text" name="" id="" />
-          <input type="text" name="" id="" />
+          <h3 class="text-center">{{ topText }}</h3>
+          <h3>{{ midText }}</h3>
+          <h3>{{ bottomText }}</h3>
         </div>
       </div>
-      <h3 class="text-xl">Add Some Text?</h3>
-
-      <ToggleSwitch @update:addText="updateAddText" />
-
-      <h3 class="text-xl">Where?</h3>
-
-      <div class="mb-1">
-        <input type="radio" id="top" name="textPlacement" value="top" />
-        <label for="top" class="ms-2">Top</label>
+      <h3 class="text-xl mt-4">Add Some Text?</h3>
+      <div class="flex gap-3 my-2">
+        <h4 class="text-lg">No</h4>
+        <ToggleSwitch :toggleType="'text'" @update:addText="updateAddText" />
+        <h4 class="text-lg">Yes</h4>
       </div>
 
-      <div class="mb-1">
-        <input type="radio" id="middle" name="textPlacement" value="middle" />
-        <label for="middle" class="ms-2">Middle</label>
+      <div v-if="addText" class="flex flex-col gap-2">
+        <input
+          v-model="topText"
+          type="text"
+          name=""
+          id=""
+          placeholder="Add text to top"
+          class="border border-black rounded-md placeholder:text-black px-2 py-1"
+        />
+        <input
+          v-model="midText"
+          type="text"
+          name=""
+          id=""
+          placeholder="Add text to middle"
+          class="border border-black rounded-md placeholder:text-black px-2 py-1"
+        />
+        <input
+          v-model="bottomText"
+          type="text"
+          name=""
+          id=""
+          placeholder="Add Text to bottom"
+          class="border border-black rounded-md placeholder:text-black px-2 py-1"
+        />
       </div>
-
-      <div class="mb-1">
-        <input type="radio" id="bottom" name="textPlacement" value="bottom" checked />
-        <label for="bottom" class="ms-2">Bottom</label>
+      <div class="">
+        <h3 class="text-xl mt-4">Change text color?</h3>
+        <div class="flex gap-3 my-2"></div>
+        <h4 class="text-lg">No</h4>
+        <ToggleSwitch :toggleType="'textColor'" @update:setFontColor="updateSetFontColor" />
+        <h4 class="text-lg">Yes</h4>
       </div>
     </section>
     <TheButton
@@ -153,6 +179,15 @@ const startRecording = async () => {
       :bgColor="btnBgColorClass"
       :textColor="btnTextColorClass"
       v-if="showContinueBtn"
+    />
+
+    <Vue3ColorPicker
+      v-if="setFontColor"
+      v-model="value"
+      mode="solid"
+      :showColorList="false"
+      :showEyeDrop="false"
+      type="RGBA"
     />
   </main>
 </template>
