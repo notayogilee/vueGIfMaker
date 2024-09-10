@@ -2,6 +2,7 @@
 import TheHeader from './components/TheHeader.vue'
 import VideoItem from './components/VideoItem.vue'
 import TheButton from './components/TheButton.vue'
+import ToggleSwitch from './components/ToggleSwitch.vue'
 import { ref, inject, computed } from 'vue'
 
 //state
@@ -10,13 +11,15 @@ const steps = {
     title: 'Start by recording a short video',
     btnText: 'Start Recording',
     btnBgColorClass: 'bg-emerald-500',
-    btnTextColorClass: 'text-white'
+    btnTextColorClass: 'text-white',
+    showContinueBtn: true
   },
   edit: {
-    title: 'Would you like to customize your gif?',
+    title: 'Customize your gif?',
     btnText: 'Edit GIF',
     btnBgColorClass: 'bg-emerald-500',
-    btnTextColorClass: 'text-white'
+    btnTextColorClass: 'text-white',
+    showContinueBtn: false
   }
 }
 
@@ -24,6 +27,10 @@ const savedRenderingContexts = ref([])
 const currentSavedRenderingContexts = ref(null)
 const currentStep = ref('recording')
 const currentGifSrc = ref('')
+const addText = ref(false)
+const topText = ref('')
+const midText = ref('')
+const bottomText = ref('')
 
 const title = computed(() => {
   return steps[currentStep.value].title
@@ -41,11 +48,19 @@ const btnTextColorClass = computed(() => {
   return steps[currentStep.value].btnTextColorClass
 })
 
+const showContinueBtn = computed(() => {
+  return steps[currentStep.value].showContinueBtn
+})
+
 const gifshot = inject('gifshot')
 
 const generateGIF = (obj) => {
-  var image = obj.image
+  let image = obj.image
   currentGifSrc.value = image
+}
+
+const updateAddText = (data) => {
+  addText.value = data
 }
 
 const startRecording = async () => {
@@ -101,14 +116,19 @@ const startRecording = async () => {
 
   <main class="flex flex-col">
     <VideoItem id="videoElement" height="400" width="400" v-if="currentStep === 'recording'" />
-    <section id="gifElement" class="mx-auto">
-      <img :src="currentGifSrc" alt="" />
-    </section>
 
-    <section id="addText" class="mx-auto my-3">
-      <h3 class="text-xl">Add Some Text...</h3>
+    <section id="editSection" class="mx-auto my-3" v-if="currentStep === 'edit'">
+      <div id="gifElement" class="mx-auto relative">
+        <img :src="currentGifSrc" alt="" />
+        <div v-if="addText" class="absolute top-0 flex flex-col h-full w-full justify-between p-2">
+          <input type="text" name="" id="" />
+          <input type="text" name="" id="" />
+          <input type="text" name="" id="" />
+        </div>
+      </div>
+      <h3 class="text-xl">Add Some Text?</h3>
 
-      <input type="text" id="gifText" class="border-2" />
+      <ToggleSwitch @update:addText="updateAddText" />
 
       <h3 class="text-xl">Where?</h3>
 
@@ -132,6 +152,7 @@ const startRecording = async () => {
       :text="btnText"
       :bgColor="btnBgColorClass"
       :textColor="btnTextColorClass"
+      v-if="showContinueBtn"
     />
   </main>
 </template>
