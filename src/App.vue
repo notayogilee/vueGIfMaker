@@ -2,8 +2,8 @@
 import TheHeader from './components/TheHeader.vue'
 import VideoItem from './components/VideoItem.vue'
 import TheButton from './components/TheButton.vue'
-import ToggleSwitch from './components/ToggleSwitch.vue'
-import { Vue3ColorPicker } from '@cyhnkckali/vue3-color-picker'
+import ColorPicker from './components/ColorPicker.vue'
+// import ToggleSwitch from './components/ToggleSwitch.vue'
 import { ref, inject, computed } from 'vue'
 
 //state
@@ -28,11 +28,15 @@ const savedRenderingContexts = ref([])
 const currentSavedRenderingContexts = ref(null)
 const currentStep = ref('recording')
 const currentGifSrc = ref('')
+const isEditing = ref(null)
 const addText = ref(false)
 const topText = ref('')
+const topTextFontSize = ref('0')
+const topTextFontWeight = ref('0')
 const midText = ref('')
 const bottomText = ref('')
 const setFontColor = ref(false)
+const textColor = ref('rgba(0,0,0,1)')
 
 const title = computed(() => {
   return steps[currentStep.value].title
@@ -54,6 +58,30 @@ const showContinueBtn = computed(() => {
   return steps[currentStep.value].showContinueBtn
 })
 
+const topTextFS = computed(() => {
+  return topTextFontSize.value === '1'
+    ? 'text-lg'
+    : topTextFontSize.value === '2'
+      ? 'text-xl'
+      : topTextFontSize.value === '3'
+        ? 'text-2xl'
+        : 'text-base'
+})
+
+const topTextFW = computed(() => {
+  return topTextFontWeight.value === '1'
+    ? 'font-medium'
+    : topTextFontWeight.value === '2'
+      ? 'font-semibold'
+      : topTextFontWeight.value === '3'
+        ? 'font-bold'
+        : topTextFontWeight.value === '4'
+          ? 'font-extrabold'
+          : topTextFontWeight.value === '5'
+            ? 'font-black'
+            : 'font-normal'
+})
+
 const gifshot = inject('gifshot')
 
 const generateGIF = (obj) => {
@@ -61,13 +89,22 @@ const generateGIF = (obj) => {
   currentGifSrc.value = image
 }
 
-const updateAddText = (data) => {
-  addText.value = data
+const editText = (loc) => {
+  addText.value = true
+  isEditing.value = loc
+  // if (loc === 'top') {
+  // } else if (loc === 'mid') {
+  // } else {
+  // }
 }
 
-const updateSetFontColor = (data) => {
-  setFontColor.value = data
-}
+// const updateAddText = (data) => {
+//   addText.value = data
+// }
+
+// const updateSetFontColor = (data) => {
+//   setFontColor.value = data
+// }
 
 const startRecording = async () => {
   const videoElement = document.getElementById('videoElement')
@@ -123,23 +160,56 @@ const startRecording = async () => {
   <main class="flex flex-col">
     <VideoItem id="videoElement" height="400" width="400" v-if="currentStep === 'recording'" />
 
-    <section id="editSection" class="mx-auto my-3" v-if="currentStep === 'edit'">
-      <div id="gifElement" class="mx-auto relative">
+    <section id="editSection" class="mx-auto my-3 min-w-80" v-if="currentStep === 'edit'">
+      <div id="gifElement" class="flex justify-center relative">
         <img :src="currentGifSrc" alt="" />
         <div v-if="addText" class="absolute top-0 flex flex-col h-full w-full justify-between p-2">
-          <h3 class="text-center">{{ topText }}</h3>
-          <h3>{{ midText }}</h3>
-          <h3>{{ bottomText }}</h3>
+          <h3 class="text-center" :class="[topTextFS, topTextFW]" :style="{ color: textColor }">
+            {{ topText }}
+          </h3>
+          <h3 class="text-center" :style="{ color: textColor }">{{ midText }}</h3>
+          <h3 class="text-center" :style="{ color: textColor }">{{ bottomText }}</h3>
         </div>
       </div>
-      <h3 class="text-xl mt-4">Add Some Text?</h3>
-      <div class="flex gap-3 my-2">
+
+      <div v-if="!isEditing" class="flex flex-col gap-2 mt-2">
+        <TheButton :text="'Add text to top'" class="w-full" @click="editText('top')" />
+        <TheButton :text="'Add text to middle'" class="w-full" @click="editText('mid')" />
+        <TheButton :text="'Add text to bottom'" class="w-full" @click="editText('bottom')" />
+      </div>
+
+      <div
+        id="topTextEdit"
+        v-if="isEditing === 'top'"
+        class="p-4 rounded-md bg-slate-900 flex flex-col mt-5"
+      >
+        <input
+          v-model="topText"
+          type="text"
+          name=""
+          id=""
+          placeholder="Add text to top"
+          class="border border-black rounded-md placeholder:text-black px-2 py-1"
+        />
+        <div class="flex justify-evenly mt-3">
+          <label for="fontSize" class="text-white">Font Size</label>
+          <input v-model="topTextFontSize" type="range" min="0" max="3" step="1" />
+        </div>
+        <div class="flex justify-evenly mt-3">
+          <label for="fontWeight" class="text-white">Thickness</label>
+          <input v-model="topTextFontWeight" type="range" min="0" max="5" step="1" />
+        </div>
+        <ColorPicker />
+        <TheButton :text="'Change color'" class="w-full mt-2" @click="setFontColor = true" />
+      </div>
+      <!-- <h3 class="text-xl mt-4">Add Some Text?</h3> -->
+      <!-- <div class="flex gap-3 my-2">
         <h4 class="text-lg">No</h4>
         <ToggleSwitch :toggleType="'text'" @update:addText="updateAddText" />
         <h4 class="text-lg">Yes</h4>
-      </div>
+      </div> -->
 
-      <div v-if="addText" class="flex flex-col gap-2">
+      <!-- <div v-if="addText" class="flex flex-col gap-2">
         <input
           v-model="topText"
           type="text"
@@ -167,11 +237,12 @@ const startRecording = async () => {
       </div>
       <div class="">
         <h3 class="text-xl mt-4">Change text color?</h3>
-        <div class="flex gap-3 my-2"></div>
-        <h4 class="text-lg">No</h4>
-        <ToggleSwitch :toggleType="'textColor'" @update:setFontColor="updateSetFontColor" />
-        <h4 class="text-lg">Yes</h4>
-      </div>
+        <div class="flex gap-3 my-2">
+          <h4 class="text-lg">No</h4>
+          <ToggleSwitch :toggleType="'textColor'" @update:setFontColor="updateSetFontColor" />
+          <h4 class="text-lg">Yes</h4>
+        </div>
+      </div> -->
     </section>
     <TheButton
       @click="startRecording"
@@ -179,15 +250,6 @@ const startRecording = async () => {
       :bgColor="btnBgColorClass"
       :textColor="btnTextColorClass"
       v-if="showContinueBtn"
-    />
-
-    <Vue3ColorPicker
-      v-if="setFontColor"
-      v-model="value"
-      mode="solid"
-      :showColorList="false"
-      :showEyeDrop="false"
-      type="RGBA"
     />
   </main>
 </template>

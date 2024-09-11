@@ -6,11 +6,11 @@ defineProps({
   },
   bgColor: {
     type: String,
-    required: true
+    default: 'bg-emerald-500'
   },
   textColor: {
     type: String,
-    required: true
+    default: 'text-white'
   }
 })
 </script>

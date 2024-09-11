@@ -11,9 +11,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "@cyhnkckali/vue3-color-picker": "^2.0.2",
     "gifshot": "^0.4.5",
-    "pinia": "^2.2.2",
     "vue": "^3.4.29"
   },
   "devDependencies": {
