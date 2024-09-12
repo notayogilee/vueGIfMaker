@@ -35,8 +35,8 @@ const topTextFontSize = ref('0')
 const topTextFontWeight = ref('0')
 const midText = ref('')
 const bottomText = ref('')
-const setFontColor = ref(false)
-const textColor = ref('rgba(0,0,0,1)')
+// const setFontColor = ref()
+const textColor = ref('text-black')
 
 const title = computed(() => {
   return steps[currentStep.value].title
@@ -82,6 +82,10 @@ const topTextFW = computed(() => {
             : 'font-normal'
 })
 
+const topTextColor = computed(() => {
+  return textColor.value
+})
+
 const gifshot = inject('gifshot')
 
 const generateGIF = (obj) => {
@@ -92,19 +96,15 @@ const generateGIF = (obj) => {
 const editText = (loc) => {
   addText.value = true
   isEditing.value = loc
-  // if (loc === 'top') {
-  // } else if (loc === 'mid') {
-  // } else {
-  // }
 }
 
 // const updateAddText = (data) => {
 //   addText.value = data
 // }
 
-// const updateSetFontColor = (data) => {
-//   setFontColor.value = data
-// }
+const updateSetTextColor = (data) => {
+  textColor.value = data
+}
 
 const startRecording = async () => {
   const videoElement = document.getElementById('videoElement')
@@ -164,7 +164,7 @@ const startRecording = async () => {
       <div id="gifElement" class="flex justify-center relative">
         <img :src="currentGifSrc" alt="" />
         <div v-if="addText" class="absolute top-0 flex flex-col h-full w-full justify-between p-2">
-          <h3 class="text-center" :class="[topTextFS, topTextFW]" :style="{ color: textColor }">
+          <h3 class="text-center" :class="[topTextFS, topTextFW, topTextColor]">
             {{ topText }}
           </h3>
           <h3 class="text-center" :style="{ color: textColor }">{{ midText }}</h3>
@@ -199,50 +199,9 @@ const startRecording = async () => {
           <label for="fontWeight" class="text-white">Thickness</label>
           <input v-model="topTextFontWeight" type="range" min="0" max="5" step="1" />
         </div>
-        <ColorPicker />
-        <TheButton :text="'Change color'" class="w-full mt-2" @click="setFontColor = true" />
+        <ColorPicker @update:setTextColor="updateSetTextColor" />
+        <TheButton :text="'Add Text'" class="w-full my-2" @click="setFontColor = true" />
       </div>
-      <!-- <h3 class="text-xl mt-4">Add Some Text?</h3> -->
-      <!-- <div class="flex gap-3 my-2">
-        <h4 class="text-lg">No</h4>
-        <ToggleSwitch :toggleType="'text'" @update:addText="updateAddText" />
-        <h4 class="text-lg">Yes</h4>
-      </div> -->
-
-      <!-- <div v-if="addText" class="flex flex-col gap-2">
-        <input
-          v-model="topText"
-          type="text"
-          name=""
-          id=""
-          placeholder="Add text to top"
-          class="border border-black rounded-md placeholder:text-black px-2 py-1"
-        />
-        <input
-          v-model="midText"
-          type="text"
-          name=""
-          id=""
-          placeholder="Add text to middle"
-          class="border border-black rounded-md placeholder:text-black px-2 py-1"
-        />
-        <input
-          v-model="bottomText"
-          type="text"
-          name=""
-          id=""
-          placeholder="Add Text to bottom"
-          class="border border-black rounded-md placeholder:text-black px-2 py-1"
-        />
-      </div>
-      <div class="">
-        <h3 class="text-xl mt-4">Change text color?</h3>
-        <div class="flex gap-3 my-2">
-          <h4 class="text-lg">No</h4>
-          <ToggleSwitch :toggleType="'textColor'" @update:setFontColor="updateSetFontColor" />
-          <h4 class="text-lg">Yes</h4>
-        </div>
-      </div> -->
     </section>
     <TheButton
       @click="startRecording"

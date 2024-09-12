@@ -1,8 +1,7 @@
-import './index.css'
-
 import { createApp } from 'vue'
-import gifshot from 'gifshot'
 import App from './App.vue'
+import gifshot from 'gifshot'
+import './index.css'
 
 const app = createApp(App)
 
