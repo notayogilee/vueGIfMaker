@@ -98,6 +98,21 @@ const editText = (loc) => {
   isEditing.value = loc
 }
 
+const setText = () => {
+  isEditing.value = null
+}
+
+const cancelEditText = (loc) => {
+  addText.value = false
+  isEditing.value = null
+
+  if (loc === 'top') {
+    topText.value = ''
+    topTextFontSize.value = '0'
+    topTextFontWeight.value = '0'
+  }
+}
+
 // const updateAddText = (data) => {
 //   addText.value = data
 // }
@@ -178,30 +193,7 @@ const startRecording = async () => {
         <TheButton :text="'Add text to bottom'" class="w-full" @click="editText('bottom')" />
       </div>
 
-      <div
-        id="topTextEdit"
-        v-if="isEditing === 'top'"
-        class="p-4 rounded-md bg-slate-900 flex flex-col mt-5"
-      >
-        <input
-          v-model="topText"
-          type="text"
-          name=""
-          id=""
-          placeholder="Add text to top"
-          class="border border-black rounded-md placeholder:text-black px-2 py-1"
-        />
-        <div class="flex justify-evenly mt-3">
-          <label for="fontSize" class="text-white">Font Size</label>
-          <input v-model="topTextFontSize" type="range" min="0" max="3" step="1" />
-        </div>
-        <div class="flex justify-evenly mt-3">
-          <label for="fontWeight" class="text-white">Thickness</label>
-          <input v-model="topTextFontWeight" type="range" min="0" max="5" step="1" />
-        </div>
-        <ColorPicker @update:setTextColor="updateSetTextColor" />
-        <TheButton :text="'Add Text'" class="w-full my-2" @click="setFontColor = true" />
-      </div>
+      <!-- here -->
     </section>
     <TheButton
       @click="startRecording"
