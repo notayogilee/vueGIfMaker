@@ -5,6 +5,14 @@ import TheButton from './components/TheButton.vue'
 import ColorPicker from './components/ColorPicker.vue'
 // import ToggleSwitch from './components/ToggleSwitch.vue'
 import { ref, inject, computed } from 'vue'
+import { useEditStore } from './stores/editStore'
+import { storeToRefs } from 'pinia'
+
+const store = useEditStore()
+
+const { text, isEditing } = storeToRefs(store)
+
+const { updateIsEditing } = store
 
 //state
 const steps = {
@@ -24,19 +32,20 @@ const steps = {
   }
 }
 
+const fontSizes = ['text-base', 'text-lg', 'text-xl', 'text-2xl']
+const fontWeights = [
+  'font-normal',
+  'font-medium',
+  'font-semibold',
+  'font-bold',
+  'font-extrabold',
+  'font-black'
+]
+
 const savedRenderingContexts = ref([])
 const currentSavedRenderingContexts = ref(null)
 const currentStep = ref('recording')
 const currentGifSrc = ref('')
-const isEditing = ref(null)
-const addText = ref(false)
-const topText = ref('')
-const topTextFontSize = ref('0')
-const topTextFontWeight = ref('0')
-const midText = ref('')
-const bottomText = ref('')
-// const setFontColor = ref()
-const textColor = ref('text-black')
 
 const title = computed(() => {
   return steps[currentStep.value].title
@@ -58,32 +67,8 @@ const showContinueBtn = computed(() => {
   return steps[currentStep.value].showContinueBtn
 })
 
-const topTextFS = computed(() => {
-  return topTextFontSize.value === '1'
-    ? 'text-lg'
-    : topTextFontSize.value === '2'
-      ? 'text-xl'
-      : topTextFontSize.value === '3'
-        ? 'text-2xl'
-        : 'text-base'
-})
-
-const topTextFW = computed(() => {
-  return topTextFontWeight.value === '1'
-    ? 'font-medium'
-    : topTextFontWeight.value === '2'
-      ? 'font-semibold'
-      : topTextFontWeight.value === '3'
-        ? 'font-bold'
-        : topTextFontWeight.value === '4'
-          ? 'font-extrabold'
-          : topTextFontWeight.value === '5'
-            ? 'font-black'
-            : 'font-normal'
-})
-
-const topTextColor = computed(() => {
-  return textColor.value
+const hasText = computed(() => {
+  return store.text.top.text || store.text.middle.text || store.text.bottom.text
 })
 
 const gifshot = inject('gifshot')
@@ -93,32 +78,12 @@ const generateGIF = (obj) => {
   currentGifSrc.value = image
 }
 
-const editText = (loc) => {
-  addText.value = true
-  isEditing.value = loc
-}
+const cancelEditText = () => {
+  text[isEditing].value = ''
+  text[isEditing].fontSize.value = '0'
+  text[isEditing].fontWeight.value = '0'
 
-const setText = () => {
-  isEditing.value = null
-}
-
-const cancelEditText = (loc) => {
-  addText.value = false
-  isEditing.value = null
-
-  if (loc === 'top') {
-    topText.value = ''
-    topTextFontSize.value = '0'
-    topTextFontWeight.value = '0'
-  }
-}
-
-// const updateAddText = (data) => {
-//   addText.value = data
-// }
-
-const updateSetTextColor = (data) => {
-  textColor.value = data
+  updateIsEditing(null)
 }
 
 const startRecording = async () => {
@@ -139,7 +104,7 @@ const startRecording = async () => {
       frameDuration: 1,
       offset: 100,
       progressCallback: function (captureProgress) {
-        console.log(`progress: ${captureProgress}`)
+        // console.log(`progress: ${captureProgress}`)
 
         if (captureProgress === 1) {
           if (stream) {
@@ -178,22 +143,76 @@ const startRecording = async () => {
     <section id="editSection" class="mx-auto my-3 min-w-80" v-if="currentStep === 'edit'">
       <div id="gifElement" class="flex justify-center relative">
         <img :src="currentGifSrc" alt="" />
-        <div v-if="addText" class="absolute top-0 flex flex-col h-full w-full justify-between p-2">
-          <h3 class="text-center" :class="[topTextFS, topTextFW, topTextColor]">
-            {{ topText }}
+        <div v-if="hasText" class="absolute top-0 flex flex-col h-full w-full justify-between p-2">
+          <h3
+            class="text-center"
+            :class="[
+              fontSizes[parseInt(store.text.top.fontSize)],
+              fontWeights[parseInt(store.text.top.fontWeight)],
+              store.text.top.color
+            ]"
+          >
+            {{ store.text.top.text }}
           </h3>
-          <h3 class="text-center" :style="{ color: textColor }">{{ midText }}</h3>
-          <h3 class="text-center" :style="{ color: textColor }">{{ bottomText }}</h3>
+          <h3
+            class="text-center"
+            :class="[
+              fontSizes[parseInt(store.text.middle.fontSize)],
+              fontWeights[parseInt(store.text.middle.fontWeight)],
+              store.text.middle.color
+            ]"
+          >
+            {{ store.text.middle.text }}
+          </h3>
+          <h3
+            class="text-center"
+            :class="[
+              fontSizes[parseInt(store.text.bottom.fontSize)],
+              fontWeights[parseInt(store.text.bottom.fontWeight)],
+              store.text.bottom.color
+            ]"
+          >
+            {{ store.text.bottom.text }}
+          </h3>
         </div>
       </div>
 
       <div v-if="!isEditing" class="flex flex-col gap-2 mt-2">
-        <TheButton :text="'Add text to top'" class="w-full" @click="editText('top')" />
-        <TheButton :text="'Add text to middle'" class="w-full" @click="editText('mid')" />
-        <TheButton :text="'Add text to bottom'" class="w-full" @click="editText('bottom')" />
+        <TheButton
+          :text="!isEditing ? 'Add text to top' : 'Edit top text'"
+          class="w-full"
+          @click="updateIsEditing('top')"
+        />
+        <TheButton :text="'Add text to middle'" class="w-full" @click="updateIsEditing('middle')" />
+        <TheButton :text="'Add text to bottom'" class="w-full" @click="updateIsEditing('bottom')" />
       </div>
 
       <!-- here -->
+
+      <div v-if="isEditing" class="p-4 rounded-md bg-slate-900 flex flex-col mt-5">
+        <input
+          v-model="store.text[isEditing].text"
+          type="text"
+          placeholder="Add text to top"
+          class="border border-black rounded-md placeholder:text-black px-2 py-1"
+        />
+        <div class="flex justify-evenly mt-3">
+          <label for="fontSize" class="text-white">Font Size</label>
+          <input v-model="store.text[isEditing].fontSize" type="range" min="0" max="3" step="1" />
+        </div>
+        <div class="flex justify-evenly mt-3">
+          <label for="fontWeight" class="text-white">Thickness</label>
+          <input v-model="store.text[isEditing].fontWeight" type="range" min="0" max="5" step="1" />
+        </div>
+        <ColorPicker />
+        <TheButton :text="'Add Changes'" class="w-full my-2" @click="updateIsEditing(null)" />
+        <TheButton
+          :text="'Cancel'"
+          :bgColor="'bg-red-600'"
+          class="w-full my-2"
+          @click="cancelEditText()"
+        />
+      </div>
     </section>
     <TheButton
       @click="startRecording"
@@ -204,5 +223,3 @@ const startRecording = async () => {
     />
   </main>
 </template>
-
-<style scoped></style>

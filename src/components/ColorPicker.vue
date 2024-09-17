@@ -1,5 +1,10 @@
 <script setup>
 import ColorPickerItem from './ColorPickerItem.vue'
+import { useEditStore } from '../stores/editStore'
+
+const store = useEditStore()
+
+const { updateColor } = store
 
 const colors = [
   ['bg-white', 'bg-slate-500', 'bg-black'],
@@ -19,11 +24,9 @@ const textColors = [
   ['text-purple-400', 'text-purple-600', 'text-purple-800']
 ]
 
-const emit = defineEmits(['update:setTextColor'])
-
 const setTextColor = (index, i) => {
   const textColor = textColors[index][i]
-  emit('update:setTextColor', textColor)
+  updateColor(textColor)
 }
 </script>
 
