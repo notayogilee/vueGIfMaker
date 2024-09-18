@@ -12,7 +12,7 @@ const store = useEditStore()
 
 const { text, isEditing } = storeToRefs(store)
 
-const { updateIsEditing } = store
+const { updateIsEditing, cancelEditText } = store
 
 //state
 const steps = {
@@ -76,14 +76,6 @@ const gifshot = inject('gifshot')
 const generateGIF = (obj) => {
   let image = obj.image
   currentGifSrc.value = image
-}
-
-const cancelEditText = () => {
-  text[isEditing].value = ''
-  text[isEditing].fontSize.value = '0'
-  text[isEditing].fontWeight.value = '0'
-
-  updateIsEditing(null)
 }
 
 const startRecording = async () => {
