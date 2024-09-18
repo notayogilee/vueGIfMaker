@@ -3,6 +3,7 @@ import TheHeader from './components/TheHeader.vue'
 import VideoItem from './components/VideoItem.vue'
 import TheButton from './components/TheButton.vue'
 import ColorPicker from './components/ColorPicker.vue'
+import GifText from './components/GifText.vue'
 // import ToggleSwitch from './components/ToggleSwitch.vue'
 import { ref, inject, computed } from 'vue'
 import { useEditStore } from './stores/editStore'
@@ -32,15 +33,15 @@ const steps = {
   }
 }
 
-const fontSizes = ['text-base', 'text-lg', 'text-xl', 'text-2xl']
-const fontWeights = [
-  'font-normal',
-  'font-medium',
-  'font-semibold',
-  'font-bold',
-  'font-extrabold',
-  'font-black'
-]
+// const fontSizes = ['text-base', 'text-lg', 'text-xl', 'text-2xl']
+// const fontWeights = [
+//   'font-normal',
+//   'font-medium',
+//   'font-semibold',
+//   'font-bold',
+//   'font-extrabold',
+//   'font-black'
+// ]
 
 const savedRenderingContexts = ref([])
 const currentSavedRenderingContexts = ref(null)
@@ -68,7 +69,7 @@ const showContinueBtn = computed(() => {
 })
 
 const hasText = computed(() => {
-  return store.text.top.text || store.text.middle.text || store.text.bottom.text
+  return text.value['top'].text || text.value['middle'].text || text.value['bottom'].text
 })
 
 const gifshot = inject('gifshot')
@@ -135,37 +136,10 @@ const startRecording = async () => {
     <section id="editSection" class="mx-auto my-3 min-w-80" v-if="currentStep === 'edit'">
       <div id="gifElement" class="flex justify-center relative">
         <img :src="currentGifSrc" alt="" />
-        <div v-if="hasText" class="absolute top-0 flex flex-col h-full w-full justify-between p-2">
-          <h3
-            class="text-center"
-            :class="[
-              fontSizes[parseInt(store.text.top.fontSize)],
-              fontWeights[parseInt(store.text.top.fontWeight)],
-              store.text.top.color
-            ]"
-          >
-            {{ store.text.top.text }}
-          </h3>
-          <h3
-            class="text-center"
-            :class="[
-              fontSizes[parseInt(store.text.middle.fontSize)],
-              fontWeights[parseInt(store.text.middle.fontWeight)],
-              store.text.middle.color
-            ]"
-          >
-            {{ store.text.middle.text }}
-          </h3>
-          <h3
-            class="text-center"
-            :class="[
-              fontSizes[parseInt(store.text.bottom.fontSize)],
-              fontWeights[parseInt(store.text.bottom.fontWeight)],
-              store.text.bottom.color
-            ]"
-          >
-            {{ store.text.bottom.text }}
-          </h3>
+        <div class="absolute top-0 flex flex-col h-full w-full justify-between p-2">
+          <GifText :loc="'top'" />
+          <GifText :loc="'middle'" />
+          <GifText :loc="'bottom'" />
         </div>
       </div>
 
