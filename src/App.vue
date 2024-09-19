@@ -10,6 +10,9 @@ import { ref, inject, computed } from 'vue'
 import { useEditStore } from './stores/editStore'
 import { storeToRefs } from 'pinia'
 
+const gifshot = inject('gifshot')
+const html2canvas = inject('html2canvas')
+
 const store = useEditStore()
 
 const { text, isEditing } = storeToRefs(store)
@@ -63,13 +66,39 @@ const hasText = computed(() => {
   return text.value['top'].text || text.value['middle'].text || text.value['bottom'].text
 })
 
-const gifshot = inject('gifshot')
-
 const generateGIF = (obj) => {
   let image = obj.image
   currentGifSrc.value = image
 }
 
+const generateOverlay = () => {
+  const overlaySection = document.getElementById('overlaySection')
+  overlaySection.classList.remove('p-0')
+  overlaySection.classList.add('pb-2')
+  overlaySection.classList.add('min-h-56')
+  html2canvas(overlaySection).then(function (canvas) {
+    // Create a temporary canvas to crop the unwanted space
+    let croppedCanvas = document.createElement('canvas')
+    let croppedContext = croppedCanvas.getContext('2d')
+
+    // Define the area you want to crop (for example: top 10 pixels removed)
+    let cropTop = 16 // Adjust this value as needed
+    let cropWidth = canvas.width
+    let cropHeight = canvas.height - cropTop
+
+    croppedCanvas.width = cropWidth
+    croppedCanvas.height = cropHeight
+
+    // Draw only the cropped area
+    croppedContext.drawImage(canvas, 0, cropTop, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight)
+
+    // const pngPlaceholer = document.getElementById('pngPlaceholder')
+    const imgElSrc = croppedCanvas.toDataURL('image/png')
+    let imgEl = document.createElement('img')
+    imgEl.src = imgElSrc
+    document.body.append(imgEl)
+  })
+}
 const startRecording = async () => {
   const videoElement = document.getElementById('videoElement')
 
@@ -127,7 +156,11 @@ const startRecording = async () => {
     <section id="editSection" class="mx-auto my-3 min-w-80" v-if="currentStep === 'edit'">
       <div id="gifElement" class="flex justify-center relative w-52 mx-auto">
         <img :src="currentGifSrc" alt="" />
-        <div v-if="hasText" class="absolute top-0 flex flex-col h-full w-full justify-between px-2">
+        <div
+          v-if="hasText"
+          id="overlaySection"
+          class="absolute top-0 flex flex-col items-center h-full w-full justify-between p-0 m-0 box-border"
+        >
           <GifText :loc="'top'" />
           <GifText :loc="'middle'" />
           <GifText :loc="'bottom'" />
@@ -142,6 +175,7 @@ const startRecording = async () => {
         />
         <TheButton :text="'Add text to middle'" class="w-full" @click="updateIsEditing('middle')" />
         <TheButton :text="'Add text to bottom'" class="w-full" @click="updateIsEditing('bottom')" />
+        <TheButton :text="'Finished Edit'" class="w-full" @click="generateOverlay()" />
       </div>
 
       <!-- here -->

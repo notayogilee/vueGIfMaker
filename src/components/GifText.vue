@@ -45,9 +45,9 @@ const verticalAlign = computed(() => {
 </script>
 
 <template>
-  <div class="flex max-w-48 mx-auto min-h-14" :class="verticalAlign">
+  <div class="flex max-w-48 mx-auto min-h-14 m-0 p-0" :class="verticalAlign">
     <h3
-      class="text-center max-w-full w-full break-words"
+      class="text-center max-w-full w-full break-words m-0 p-0"
       :class="[fontSizes[fontSizeIndex], fontWeights[fontWeightIndex], textColor]"
     >
       {{ enteredText }}
