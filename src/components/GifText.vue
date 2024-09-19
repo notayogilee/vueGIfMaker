@@ -38,13 +38,19 @@ const textColor = computed(() => {
 const enteredText = computed(() => {
   return text.value[props.loc].text
 })
+
+const verticalAlign = computed(() => {
+  return props.loc === 'middle' ? 'items-center' : props.loc === 'bottom' ? 'items-end' : ''
+})
 </script>
 
 <template>
-  <h3
-    class="text-center"
-    :class="[fontSizes[fontSizeIndex], fontWeights[fontWeightIndex], textColor]"
-  >
-    {{ enteredText }}
-  </h3>
+  <div class="flex max-w-48 mx-auto min-h-14" :class="verticalAlign">
+    <h3
+      class="text-center max-w-full w-full break-words"
+      :class="[fontSizes[fontSizeIndex], fontWeights[fontWeightIndex], textColor]"
+    >
+      {{ enteredText }}
+    </h3>
+  </div>
 </template>

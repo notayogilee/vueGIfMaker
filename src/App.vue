@@ -33,16 +33,6 @@ const steps = {
   }
 }
 
-// const fontSizes = ['text-base', 'text-lg', 'text-xl', 'text-2xl']
-// const fontWeights = [
-//   'font-normal',
-//   'font-medium',
-//   'font-semibold',
-//   'font-bold',
-//   'font-extrabold',
-//   'font-black'
-// ]
-
 const savedRenderingContexts = ref([])
 const currentSavedRenderingContexts = ref(null)
 const currentStep = ref('recording')
@@ -89,8 +79,8 @@ const startRecording = async () => {
 
   gifshot.createGIF(
     {
-      gifWidth: 200,
-      gifHeight: 200,
+      gifWidth: 208,
+      gifHeight: 208,
       sampleInterval: 10,
       numFrames: 10, // number of frames used in gif - this will increase time
       interval: 0.1, // higher increase speed
@@ -134,9 +124,9 @@ const startRecording = async () => {
     <VideoItem id="videoElement" height="400" width="400" v-if="currentStep === 'recording'" />
 
     <section id="editSection" class="mx-auto my-3 min-w-80" v-if="currentStep === 'edit'">
-      <div id="gifElement" class="flex justify-center relative">
+      <div id="gifElement" class="flex justify-center relative w-52 mx-auto">
         <img :src="currentGifSrc" alt="" />
-        <div class="absolute top-0 flex flex-col h-full w-full justify-between p-2">
+        <div v-if="hasText" class="absolute top-0 flex flex-col h-full w-full justify-between px-2">
           <GifText :loc="'top'" />
           <GifText :loc="'middle'" />
           <GifText :loc="'bottom'" />
@@ -156,12 +146,16 @@ const startRecording = async () => {
       <!-- here -->
 
       <div v-if="isEditing" class="p-4 rounded-md bg-slate-900 flex flex-col mt-5">
-        <input
-          v-model="store.text[isEditing].text"
-          type="text"
-          placeholder="Add text to top"
-          class="border border-black rounded-md placeholder:text-black px-2 py-1"
-        />
+        <div class="flex justify-evenly mt-3">
+          <input
+            v-model="store.text[isEditing].text"
+            type="text"
+            maxlength="25"
+            placeholder="Add text to top"
+            class="border border-black rounded-md placeholder:text-black px-2 py-1"
+          />
+        </div>
+
         <div class="flex justify-evenly mt-3">
           <label for="fontSize" class="text-white">Font Size</label>
           <input v-model="store.text[isEditing].fontSize" type="range" min="0" max="3" step="1" />
