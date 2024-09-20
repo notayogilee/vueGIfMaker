@@ -46,6 +46,7 @@ export const useEditStore = defineStore('textEdit', () => {
     text,
     addText,
     isEditing,
+    showOverlay,
     updateIsEditing,
     cancelEditText,
     updateColor
